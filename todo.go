@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/alexeyco/simpletable"
 )
 
 type Task struct {
@@ -36,7 +38,7 @@ func (t *Todos) Completed(index int) error {
 		return errors.New("invalid index")
 	}
 
-	ls[index-1].CreatedAt = time.Now()
+	ls[index-1].Completed = time.Now()
 	ls[index-1].Done = true
 
 	return nil
@@ -87,8 +89,59 @@ func (t *Todos) Store(filename string) error {
 
 // Print method get all tasks from file
 func (t *Todos) Print() {
-	for i, item := range *t {
-		i++
-		fmt.Printf("%d - %s\n", i, item.Title)
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "Task"},
+			{Align: simpletable.AlignCenter, Text: "Done?"},
+			{Align: simpletable.AlignRight, Text: "Created"},
+			{Align: simpletable.AlignRight, Text: "Completed"},
+		},
 	}
+
+	var cells [][]*simpletable.Cell
+
+	for idx, ell := range *t {
+		idx++
+
+		task := blue(ell.Title)
+		done := blue("no")
+		completedAt := blue("")
+		if ell.Done {
+			task = green(fmt.Sprintf("\u2705 %s", ell.Title))
+			done = green("yes")
+			completedAt = green(ell.Completed.Format(time.RFC822))
+		}
+
+		cells = append(cells, []*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", idx)},
+			{Text: task},
+			{Text: done},
+			{Text: ell.CreatedAt.Format(time.RFC822)},
+			{Text: completedAt},
+		})
+	}
+
+	table.Body = &simpletable.Body{Cells: cells}
+
+	table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+		{Align: simpletable.AlignCenter, Span: 5, Text: red(fmt.Sprintf("You need to complete %d tasks", t.CountPending()))},
+	}}
+
+	table.SetStyle(simpletable.StyleUnicode)
+
+	table.Println()
+}
+
+func (t *Todos) CountPending() int {
+	total := 0
+	for _, ell := range *t {
+		if !ell.Done {
+			total++
+		}
+	}
+
+	return total
 }

@@ -22,7 +22,7 @@ const (
 // main function runs app
 func main() {
 	add := flag.Bool("add", false, "add a new task")
-	complete := flag.Int("complete", 0, "mark task as completed")
+	complete := flag.Int("done", 0, "mark task as completed")
 	del := flag.Int("delete", 0, "delete a task")
 	list := flag.Bool("list", false, "show all todos")
 
@@ -73,7 +73,15 @@ func main() {
 	case *list:
 		todos.Print()
 	default:
-		fmt.Fprintln(os.Stdout, "invalid command")
+		fmt.Fprintln(os.Stdout,
+			`This is application for tasks managment.
+
+Help:
+    -add <enter_your_task_title> (create new task)
+    -list                        (table of all tasks)
+    -done <number_of_task>       (mark task as completed)
+    -delete <number_of_task>     (remove the task)`,
+		)
 		os.Exit(0)
 
 	}
