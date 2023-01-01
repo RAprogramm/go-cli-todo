@@ -1,24 +1,26 @@
-package main
+package todo
 
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"time"
 )
 
-type task struct {
+type Task struct {
 	Title     string
 	CreatedAt time.Time
 	Completed time.Time
 	Done      bool
 }
 
-type Todos []task
+type Todos []Task
 
+// Add method create a task and add it to task list
 func (t *Todos) Add(task string) {
-	todo := task{
+	todo := Task{
 		Title:     task,
 		CreatedAt: time.Now(),
 		Completed: time.Time{},
@@ -27,6 +29,7 @@ func (t *Todos) Add(task string) {
 	*t = append(*t, todo)
 }
 
+// Completed method change index of a task to mark it as completed
 func (t *Todos) Completed(index int) error {
 	ls := *t
 	if index <= 0 || index > len(ls) {
@@ -39,6 +42,7 @@ func (t *Todos) Completed(index int) error {
 	return nil
 }
 
+// Delete method remove task from list
 func (t *Todos) Delete(index int) error {
 	ls := *t
 	if index <= 0 || index > len(ls) {
@@ -50,6 +54,7 @@ func (t *Todos) Delete(index int) error {
 	return nil
 }
 
+// Load method read json file and return it
 func (t *Todos) Load(filename string) error {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -70,6 +75,7 @@ func (t *Todos) Load(filename string) error {
 	return nil
 }
 
+// Store method save task into json file
 func (t *Todos) Store(filename string) error {
 	data, err := json.Marshal(t)
 	if err != nil {
@@ -77,4 +83,12 @@ func (t *Todos) Store(filename string) error {
 	}
 
 	return ioutil.WriteFile(filename, data, 0644)
+}
+
+// Print method get all tasks from file
+func (t *Todos) Print() {
+	for i, item := range *t {
+		i++
+		fmt.Printf("%d - %s\n", i, item.Title)
+	}
 }
