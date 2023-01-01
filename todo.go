@@ -139,8 +139,7 @@ func (t *Todos) Print() {
 		fmt.Println(`
         At real time there are not tasks.
 
-        Create new one by command:
-            -add <your_task_title> 
+        It's time to create new one!
         `)
 	}
 
