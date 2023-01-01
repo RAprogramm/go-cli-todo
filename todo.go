@@ -124,15 +124,26 @@ func (t *Todos) Print() {
 		})
 	}
 
-	table.Body = &simpletable.Body{Cells: cells}
+	ls := *t
+	if len(ls) > 0 {
+		table.Body = &simpletable.Body{Cells: cells}
 
-	table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
-		{Align: simpletable.AlignCenter, Span: 5, Text: red(fmt.Sprintf("You need to complete %d tasks", t.CountPending()))},
-	}}
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 5, Text: red(fmt.Sprintf("You need to complete %d tasks", t.CountPending()))},
+		}}
 
-	table.SetStyle(simpletable.StyleUnicode)
+		table.SetStyle(simpletable.StyleUnicode)
 
-	table.Println()
+		table.Println()
+	} else {
+		fmt.Println(`
+        At real time there are not tasks.
+
+        Create new one by command:
+            -add <your_task_title> 
+        `)
+	}
+
 }
 
 func (t *Todos) CountPending() int {
